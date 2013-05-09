@@ -1,5 +1,5 @@
 <?php
-error_reporting(0);
+error_reporting(E_ALL);
 
 
 // Load the dependencies
@@ -117,7 +117,7 @@ class changedbinariesmain{
 
       $fname = sha1($file);
 
-      if (!include(dirname(__FILE__)."/../db/$fname.def")){
+      if (!file_exists(dirname(__FILE__)."/../db/$fname.def") || !include(dirname(__FILE__)."/../db/$fname.def")){
 	$this->notify->warning("Could not load definition for $file");
 	return false;
       }
@@ -151,6 +151,7 @@ class changedbinariesmain{
 
 
 }
+
 
 
 
@@ -193,12 +194,13 @@ if (file_exists(dirname(__FILE__)."/../config/additional_files.cfg")){
 
 
 
+
 /** TODO: Implement proper password control
 *
 */
 if ($argv[1] == "-upd"){
 
-  if ($cbins->getInput("Password") == 1234){
+  if ($cbins->getInput("Enter YES if you're sure all files are unmodified") == "YES"){
     $cbins->setaction('store');
   }else{
     echo "Incorrect password";
@@ -212,6 +214,18 @@ if ($argv[1] == "-upd"){
     $cbins->notify->alarm($alert);
     die;
   }
+
+}elseif($argv[1] == '-updfile'){
+
+  // Update hash for a single file
+  $file = $argv[2];
+
+  if (file_exists($file)){
+    $cbins->storeHash($file);
+  }else{
+    echo "File does not exist";
+  }
+
 
 }else{
   $cbins->setaction('check');

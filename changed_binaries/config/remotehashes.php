@@ -5,12 +5,12 @@
 
 
 
-$remote_store_enabled = 1;
-$api_server = 'http://api.bentasker.co.uk/hashstore';
-$api_key = '1234';
+$remote_store_enabled = true;
+$config['api_server'] = 'http://api.bentasker.co.uk/hashstore';
+$config['api_key'] = '1234';
 
 // Don't change this!
-$api_secret = '6789';
+$config['api_secret'] = '6789';
 
 
 

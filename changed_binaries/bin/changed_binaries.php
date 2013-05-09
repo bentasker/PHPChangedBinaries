@@ -171,6 +171,27 @@ if (is_dir('/usr/local/psa/bin/')){
 // Make sure we check our own integrity 
 $cbins->addfile(__FILE__);
 
+// Load any additional files
+if (file_exists(dirname(__FILE__)."/../config/additional_files.cfg")){
+  $lines = file(dirname(__FILE__)."/../config/additional_files.cfg");
+
+  foreach($lines as $line){
+    if (strpos($line,"#") !== false || strpos($line,"/") === false){
+      continue;
+    }
+    $line = trim($line);
+
+    if (is_dir($line)){
+      $cbins->setadditional($line);
+      continue;
+    }
+
+    $cbins->addfile($line);
+  }
+
+}
+
+
 
 /** TODO: Implement proper password control
 *

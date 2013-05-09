@@ -3,7 +3,10 @@ error_reporting(E_ALL);
 
 
 // Load the dependencies
-require_once('notify.class.php');
+require_once('../lib/notify.class.php');
+require_once('../lib/Remote.class.php');
+
+
 
 class changedbinariesmain{
 
@@ -15,6 +18,7 @@ class changedbinariesmain{
 
     function __construct(){
       $this->notify = new changedbinariesNotify;
+      $this->remote = new changedbinariesRemote;
     }
 
 

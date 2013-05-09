@@ -1,7 +1,5 @@
 <?php
 
-
-
 class changedbinariesNotify{
    protected $alarms = array();
    protected $warnings = array();

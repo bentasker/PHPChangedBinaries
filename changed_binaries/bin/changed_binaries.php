@@ -2,10 +2,20 @@
 error_reporting(0);
 
 
+// Load the dependencies
+require_once('notify.class.php');
+
 class changedbinariesmain{
 
     protected $path;
     protected $action;
+    protected $files = array();
+    var $notify;
+
+
+    function __construct(){
+      $this->notify = new changedbinariesNotify;
+    }
 
 
     function getpath(){
@@ -21,13 +31,22 @@ class changedbinariesmain{
     }
 
 
+    function addfile($file){
+      if (!file_exists($file)){
+	return false;
+      }
+
+      $this->files[] = $file;
+    }
+
+
     function setaction($act){
       $this->action = $act;
     }
 
 
     function checkfiles($dir){
-      $fn = $this->action."Hash";
+
 
       if (!is_dir($dir) || !$h = opendir($dir)){
 	return false;
@@ -47,18 +66,23 @@ class changedbinariesmain{
 	}
 
 
-	$this->$fn($trg);
+	$this->checkfile($trg);
 
       }
 
     }
 
 
+    function checkfile($file){
+      $fn = $this->action."Hash";
+      $this->$fn($file);
+    }
+
 
     function storeHash($file){
       $fname = sha1($file);
       $hash = $this->calcHash($file);
-      echo "Storing hash for $file in ". dirname(__FILE__)."/../db/$fname.def\n";
+      $this->notify->info("Storing hash for $file in ". dirname(__FILE__)."/../db/$fname.def");
 
       $f = fopen(dirname(__FILE__)."/../db/$fname.def",'w');
 
@@ -81,30 +105,12 @@ class changedbinariesmain{
       $stored = $this->loadDef($file);
 
       if ($cur != $stored){
-	echo "ALERT: $file has changed\n";
+	$this->notify->alarm("$file has changed");
       }else{
-	echo "FINE: $file unchanged since last update\n";
+	$this->notify->info("$file unchanged since last update");
       }
 
     }
-
-
-    /** TODO: Do something slightly more useful!
-    *
-    */
-    function fileChanged($file){
-      echo "ALERT: $file has changed\n";
-
-    }
-
-
-    /** TODO: Do something slightly more useful!
-    *
-    */
-    function fileUnChanged($file){
-      echo "FINE: $file unchanged since last update";
-    }
-
 
 
     function loadDef($file){
@@ -112,7 +118,7 @@ class changedbinariesmain{
       $fname = sha1($file);
 
       if (!include(dirname(__FILE__)."/../db/$fname.def")){
-	echo "WARN: Could not load definition for $file\n";
+	$this->notify->warning("Could not load definition for $file");
 	return false;
       }
 
@@ -122,9 +128,16 @@ class changedbinariesmain{
 
 
     function init(){
+
+      foreach ($this->files as $file){
+	  $this->checkfile($file);
+      }
+
+
       foreach ($this->path as $path){
       $this->checkfiles($path);
       }
+
 
     }
 
@@ -155,6 +168,10 @@ if (is_dir('/usr/local/psa/bin/')){
 }
 
 
+// Make sure we check our own integrity 
+$cbins->addfile(__FILE__);
+
+
 /** TODO: Implement proper password control
 *
 */
@@ -164,6 +181,14 @@ if ($argv[1] == "-upd"){
     $cbins->setaction('store');
   }else{
     echo "Incorrect password";
+      $alert = "Unauthorised attempt to update file hashes by ".getenv("USER")." at ".date('Y-m-d H:i:s');
+
+      $ssh = getenv('SSH_CLIENT');
+      if (!empty($ssh)){
+	$alert .= " SSH connection details are $ssh";
+      }
+
+    $cbins->notify->alarm($alert);
     die;
   }
 
@@ -173,15 +198,7 @@ if ($argv[1] == "-upd"){
 
 
 
-
+// Start the check
 $cbins->init();
-
-
-
-
-
-
-
-
 
 ?>

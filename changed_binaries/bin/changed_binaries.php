@@ -132,6 +132,10 @@ class changedbinariesmain{
 
       $remote = $this->remote->updatehash($file,$hash);
 
+      if ($remote == 'KEYFAIL'){
+	exit;
+      }
+
       // If remote is false, the remotehash store is disabled in config
       if (!$remote){
 	  $this->notify->info("Storing hash for $file");

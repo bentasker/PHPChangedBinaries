@@ -12,5 +12,7 @@ $notify['warning'] = true;
 $notify['alarm'] = true;
 
 
-
+// Debug settings
+$notify['displaydebug'] = false;
+$notify['emaildebug'] = false;
 ?> 

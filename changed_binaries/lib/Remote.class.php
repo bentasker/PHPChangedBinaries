@@ -6,6 +6,7 @@ class changedbinariesRemote{
 
     protected $enabled;
     protected $config;
+    protected $token;
     var $notify;
 
 
@@ -22,7 +23,8 @@ class changedbinariesRemote{
       if (!$this->enabled){
 	return array(false,null);
       }
-      
+      $this->notify->debug("Attempting to retrieve hash from RemoteStore");
+
       $fname = sha1($file);
 
       // this is going to break things for testing
@@ -37,9 +39,49 @@ class changedbinariesRemote{
       }
 
       $fname = sha1($file);
-	
-	
+
+      // Unlock the token
+      if (!$this->getauthToken()){
+	// We couldn't load it. Don't return false as we don't want to fall back on the local db
+	return 'KEYFAIL';
+      }
+
+	$this->notify->debug("Attempting to update has in RemoteStore");
+    /* We'll be needing this once the API response comes back.
+	echo "Incorrect password";
+	  $alert = "Unauthorised attempt to update file hashes by ".getenv("USER")." at ".date('Y-m-d H:i:s');
+
+	  $ssh = getenv('SSH_CLIENT');
+	  if (!empty($ssh)){
+	    $alert .= " SSH connection details are $ssh";
+	  }
+
+    */
     }
+
+
+
+    function getauthToken(){
+      if (!isset($this->token) || empty($this->token)){
+	  $this->notify->debug("Requesting credentials");
+
+	  $pass = hash("sha512",changedbinariesmain::getInput('Enter password'));
+
+	  if (!file_exists(dirname(__FILE__)."/../config/authkey")){
+	    $this->notify->debug("Could not load ".dirname(__FILE__)."/../config/authkey");
+	    $this->notify->warning('Authkey file does not exist');
+	    return false;
+	  }
+
+	  $this->notify->debug("Decrypting key");
+	  $str = implode("\n",file(dirname(__FILE__)."/../config/authkey"));
+	  $this->token = openssl_decrypt($str,'des-cbc',$pass);
+	  
+	  return true;
+      }
+    }
+
+
 
 }
 

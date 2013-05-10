@@ -4,6 +4,7 @@ class changedbinariesNotify{
    protected $alarms = array();
    protected $warnings = array();
    protected $infos = array();
+   protected $debugs = array();
    protected $config;
 
 
@@ -31,6 +32,18 @@ class changedbinariesNotify{
     $this->infos[] = $str;
   }
 
+
+  function debug($str){
+
+    if ($this->config['displaydebug']){
+      echo "$str\n";
+    }
+
+    if ($this->config['emaildebug']){
+    $this->debugs[] = $str;
+    }
+
+  }
 
 
   function __destruct() {

@@ -27,7 +27,9 @@ class changedbinariesmain{
     *
     */
     function getpath(){
-      $this->path = explode(":",getenv("PATH"));
+      $path = getenv("PATH");
+      $this->notify->debug('Adding Path ('.$path.') to check');
+      $this->path = explode(":",$path);
       return $this->path;
     }
 
@@ -37,6 +39,7 @@ class changedbinariesmain{
     */
     function setadditional($dir){
       if (!in_array($dir,$this->path)){
+	$this->notify->debug('Adding '.$dir.' to checkPath');
 	$this->path[] = $dir;
       }
     }
@@ -50,7 +53,7 @@ class changedbinariesmain{
       if (!file_exists($file)){
 	return false;
       }
-
+      $this->notify->debug('Adding '.$file.' to checkPath');
       $this->files[] = $file;
     }
 
@@ -100,6 +103,7 @@ class changedbinariesmain{
     */
     function checkfile($file){
       $fn = $this->action."Hash";
+      $this->notify->debug('Running  '.$fn.' on '.$file);
       $this->$fn($file);
     }
 
@@ -119,7 +123,8 @@ class changedbinariesmain{
 
       // If remote is false, the remotehash store is disabled in config
       if (!$remote){
-	  $this->notify->info("Storing hash for $file in ". dirname(__FILE__)."/../db/$fname.def");
+	  $this->notify->info("Storing hash for $file");
+	  $this->notify->debug("Storing hash for $file in ". dirname(__FILE__)."/../db/$fname.def");
 
 	  $f = fopen(dirname(__FILE__)."/../db/$fname.def",'w');
 
@@ -159,6 +164,8 @@ class changedbinariesmain{
 	$stored = $this->loadDef($file);
       }
 
+      $this->notify->debug("Comparing $cur to $stored for $file");
+
       // Compare the hashes
       if ($cur != $stored){
 	$this->notify->alarm("$file has changed");
@@ -176,7 +183,7 @@ class changedbinariesmain{
     function loadDef($file){
 
       $fname = sha1($file);
-
+      $this->notify->debug("Loading ".dirname(__FILE__)."/../db/$fname.def");
       if (!file_exists(dirname(__FILE__)."/../db/$fname.def") || !include(dirname(__FILE__)."/../db/$fname.def")){
 	$this->notify->warning("Could not load definition for $file");
 	return false;
@@ -222,6 +229,10 @@ class changedbinariesmain{
 
 
 $cbins = new changedbinariesmain;
+
+$cbins->notify->debug('System loaded '. date('Y-m-d H:i:s'));
+$cbins->notify->debug('Called with arguments'.$argv[0]);
+
 $cbins->getpath();
 
 /** If CPanel or Plesk are installed, we want to check them too - not always in PATH
@@ -236,7 +247,10 @@ if (is_dir('/usr/local/psa/bin/')){
 
 
 // Make sure we check our own integrity 
+$cbins->notify->debug('Adding self to checkpath');
+$cbins->setadditional(dirname(__FILE__)."/../lib/");
 $cbins->addfile(__FILE__);
+
 
 // Load any additional files
 if (file_exists(dirname(__FILE__)."/../config/additional_files.cfg")){
@@ -248,6 +262,7 @@ if (file_exists(dirname(__FILE__)."/../config/additional_files.cfg")){
     }
     $line = trim($line);
 
+    $cbins->notify->debug('Adding '.$line.' to checkpath');
     if (is_dir($line)){
       $cbins->setadditional($line);
       continue;
@@ -259,25 +274,15 @@ if (file_exists(dirname(__FILE__)."/../config/additional_files.cfg")){
 }
 
 
-
-
-/** TODO: Implement proper password control
-*
-*/
+// Check what we need to do
 if ($argv[1] == "-upd"){
 
   if ($cbins->getInput("Enter YES if you're sure all files are unmodified") == "YES"){
+
+    $cbins->notify->debug('Setting action to storeHash');
     $cbins->setaction('store');
   }else{
-    echo "Incorrect password";
-      $alert = "Unauthorised attempt to update file hashes by ".getenv("USER")." at ".date('Y-m-d H:i:s');
-
-      $ssh = getenv('SSH_CLIENT');
-      if (!empty($ssh)){
-	$alert .= " SSH connection details are $ssh";
-      }
-
-    $cbins->notify->alarm($alert);
+    $cbins->notify->info('Aborting');
     die;
   }
 
@@ -294,6 +299,7 @@ if ($argv[1] == "-upd"){
 
 
 }else{
+  $cbins->notify->debug('Setting action to checkHash');
   $cbins->setaction('check');
 }
 

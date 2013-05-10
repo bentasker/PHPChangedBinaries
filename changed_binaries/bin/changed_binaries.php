@@ -157,20 +157,19 @@ class changedbinariesmain{
 
       $cur = $this->calcHash($file);
 
-      list($remote,$stored) = $this->remote->retrievehash($file);
+      list($remote,$stored) = $this->remote->retrievehash($file,$cur);
 
       // If remote is false it means the remotehash store is disabled in the config
       if (!$remote){
-	$stored = $this->loadDef($file);
-      }
+	  $stored = $this->loadDef($file);
+	  $this->notify->debug("Comparing $cur to $stored for $file");
 
-      $this->notify->debug("Comparing $cur to $stored for $file");
-
-      // Compare the hashes
-      if ($cur != $stored){
-	$this->notify->alarm("$file has changed");
-      }else{
-	$this->notify->info("$file unchanged since last update");
+	  // Compare the hashes
+	  if ($cur != $stored){
+	    $this->notify->alarm("$file has changed");
+	  }else{
+	    $this->notify->info("$file unchanged since last update");
+	  }
       }
 
     }

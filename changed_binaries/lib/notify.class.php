@@ -5,6 +5,7 @@ class changedbinariesNotify{
    protected $warnings = array();
    protected $infos = array();
    protected $debugs = array();
+   protected $secalerts = array();
    protected $config;
 
 
@@ -45,14 +46,25 @@ class changedbinariesNotify{
 
   }
 
+  function secalert($str){
+    $this->secalerts[] = $str;
+  }
+
 
   function __destruct() {
     echo "Notify: Processing queued notifications\n\n";
-    $msg = date('Y-m-d H:i:s') . ": Changed Binaries output follows\n".
-	  count($this->alarms) . " Alarms\n" . count($this->warnings) . " Warnings\n" . count($this->infos) . " Information messages\n\n";
 
     if (!$this->config['enabled'] || empty($this->config['address'])){
       return;
+    }
+    $secalerts = count($this->secalerts);
+
+    $msg = date('Y-m-d H:i:s') . ": Changed Binaries output follows\n".
+	  $secalerts . " Security alerts".
+	  count($this->alarms) . " Alarms\n" . count($this->warnings) . " Warnings\n" . count($this->infos) . " Information messages\n\n";
+
+    if ($secalerts > 0){
+    $msg .=  "\n\nSECURITY ALERTS\n\n" . implode("\n",$this->secalerts);
     }
 
     if ($this->config['alarm']){

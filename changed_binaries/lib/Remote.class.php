@@ -1,4 +1,14 @@
 <?php
+/** RemoteHashStore support library for changed_binaries
+*
+* @author B Tasker
+* @copyright B Tasker 2013
+* 
+* @license GNU GPL V2 - See LICENSE
+*
+* This implements support for the API server - moving the hashes away from the server we're checking!
+*
+*/
 
 
 
@@ -18,6 +28,12 @@ class changedbinariesRemote{
     }
 
 
+    /** Check the supplied hash against the one stored on the API server
+    *
+    * @arg file - str, full path to file
+    * @arg hash - str, hash of current file
+    *
+    */
     function retrievehash($file,$hash){
 
       if (!$this->enabled){
@@ -35,22 +51,25 @@ class changedbinariesRemote{
       $req->request = new stdClass();
       $req->key = $this->config['api_key'];
       $req->token = $this->config['api_secret'];
+      $req->server = $this->config['server_ident'];
+      $req->alert = $this->config['server_email'];
       $req->request->$apiIndex->filehash = $fname;
       $req->request->$apiIndex->curhash = $hash;
       $req->request->$apiIndex->filename = $file;
-
       $request = json_encode($req);
+
       $this->notify->debug("Request is $request");
+
+      // Place the request
       $resp = $this->placeRequest($request);
       
+      // Check the response
       if (!$resp){
 	$this->notify->warning("API Request for $file failed");
 	return array('CONNECTFAIL',null);
       }
 
       $resp = json_decode($resp);
-
-
       if ($resp->status != 'ok'){
 	$this->notify->warning("API Reported an error: {$resp->status}: {$resp->error}");
 	return array("APIERROR",null);
@@ -65,13 +84,17 @@ class changedbinariesRemote{
 	return array("RESPRECEIVED",null);
       }
       
-      // this is going to break things for testing
-      return array(true,null);
     }
 
 
 
-
+    /** Update hash on the API server for the specified file
+    *
+    * @arg file - string. Full path to the file
+    * @arg hash - string hash of that file
+    *
+    *
+    */
     function updatehash($file,$hash){
 
       if (!$this->enabled){
@@ -92,20 +115,24 @@ class changedbinariesRemote{
       }
 
       $this->notify->debug("Building request");
+
       // Build the request
       $req = new stdClass();
       $req->action = 'upd';
       $req->request = new stdClass();
       $req->key = $this->config['api_key'];
+      $req->server = $this->config['server_ident'];
       $req->token = $this->token;
       $req->request->$apiIndex->filehash = $fname;
       $req->request->$apiIndex->curhash = $hash;
       $req->request->$apiIndex->filename = $file;
-
       $request = json_encode($req);
+
+      // Place the request
       $this->notify->debug("Request is $request");
       $resp = $this->placeRequest($request);
       
+      // Check the response
       if (!$resp){
 	$this->notify->warning("API Request for $file failed");
 	return 'CONNECTFAIL';
@@ -118,7 +145,7 @@ class changedbinariesRemote{
 	return "APIERROR";
 
       }elseif($resp->status == 'autherror'){
-
+	// The supplied password was wrong
 	$alert = "Unauthorised attempt to update file hashes by ".getenv("USER")." at ".date('Y-m-d H:i:s');
 	$ssh = getenv('SSH_CLIENT');
 	 if (!empty($ssh)){
@@ -138,6 +165,14 @@ class changedbinariesRemote{
     }
 
 
+
+
+    /** Post the supplied request to the API server
+    *
+    * @arg request - JSON encoded string
+    *
+    * @return JSON string
+    */
     function placeRequest($request){
 
 	$fields_string ='';
@@ -157,6 +192,14 @@ class changedbinariesRemote{
     }
 
 
+
+    /** Request a password from the user and use it to decrypt the auth token
+    *
+    * If the password is incorrect, the API server will know. The aim of this is
+    * to prevent an attacker from updating hashes after rooting the server. Can't 
+    * easily prevent that if the pass is stored on the same machine!
+    *
+    */
     function getauthToken(){
       if (!isset($this->token) || empty($this->token)){
 	  $this->notify->debug("Requesting credentials");

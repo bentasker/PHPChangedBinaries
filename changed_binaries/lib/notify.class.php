@@ -1,4 +1,15 @@
 <?php
+/** changedbinaries Notification library
+*
+* @author B Tasker
+* @copyright B Tasker 2013
+* 
+* @license GNU GPL V2 - See LICENSE
+*
+* Handles all notifications, if configured to do so will email on completion.
+*
+*/
+
 
 class changedbinariesNotify{
    protected $alarms = array();

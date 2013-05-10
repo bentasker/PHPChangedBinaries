@@ -1,4 +1,15 @@
 <?php
+/** changed_binaries
+*
+* @author B Tasker
+* @copyright B Tasker 2013
+* 
+* @license GNU GPL V2 - See LICENSE
+*
+* Checks system binaries against stored hashes to detect changes
+*
+*/
+
 error_reporting(E_ALL);
 
 

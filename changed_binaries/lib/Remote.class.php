@@ -131,7 +131,7 @@ class changedbinariesRemote{
       }
       
 
-      if ($resp->$apiIndex->match == 1){
+      if ($resp->response->$apiIndex->match == 1){
 	$this->notify->info("$file unchanged since last update");
 	return array("RESPRECEIVED",null);
       }else{

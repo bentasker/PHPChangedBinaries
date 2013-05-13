@@ -47,10 +47,9 @@ class changedbinariesRemote{
       $req->key = $this->config['api_key'];
       $req->token = $this->config['api_secret'];
       $req->server = $this->config['server_ident'];
-      $req->alert = $this->config['server_email'];
       $request = json_encode($req);
       $this->notify->debug("Attempting to open Audit session");
-      $resp = $this->placeRequest($request);
+      $resp = json_decode($this->placeRequest($request));
 
       if (!$resp || $resp->status != 'ok'){
 	$this->notify->warning("Could not open audit session");
@@ -58,6 +57,28 @@ class changedbinariesRemote{
       }
       $this->sessid = $resp->response->session;
 
+    }
+
+
+    function closeAuditSession(){
+
+      $req = new stdClass();
+      $req->action = 'end';
+      $req->requesttime = time();
+      $req->key = $this->config['api_key'];
+      $req->token = $this->config['api_secret'];
+      $req->server = $this->config['server_ident'];
+      $req->session = $this->sessid;
+      $request = json_encode($req);
+      $this->notify->debug("Attempting to open Audit session");
+      $resp = json_decode($this->placeRequest($request));
+
+      if (!$resp || $resp->status != 'ok'){
+	$this->notify->warning("Could not close audit session");
+	return false;
+      }
+
+      unset($this->sessid);
     }
 
 
@@ -85,7 +106,6 @@ class changedbinariesRemote{
       $req->key = $this->config['api_key'];
       $req->token = $this->config['api_secret'];
       $req->server = $this->config['server_ident'];
-      $req->alert = $this->config['server_email'];
       $req->session = $this->sessid;
       $req->request = new stdClass();
       $req->request->$apiIndex->filehash = $fname;
@@ -106,7 +126,7 @@ class changedbinariesRemote{
 
       $resp = json_decode($resp);
       if ($resp->status != 'ok'){
-	$this->notify->warning("API Reported an error: {$resp->status}: {$resp->error}");
+	$this->notify->warning("{$resp->status}: {$resp->error}");
 	return array("APIERROR",null);
       }
       
@@ -189,6 +209,7 @@ class changedbinariesRemote{
 	    $alert .= " SSH connection details are $ssh";
 	 }
 	$this->notify->secalert($alert);
+	exit;
 
       }
 
@@ -258,6 +279,9 @@ class changedbinariesRemote{
 	  return true;
     }
 
+    function __destruct(){
+      $this->closeAuditSession();
+    }
 
 
 }

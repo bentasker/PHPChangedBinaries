@@ -48,11 +48,12 @@ class changedbinariesRemote{
       // Build the request
       $req = new stdClass();
       $req->action = 'check';
-      $req->request = new stdClass();
+      $req->requesttime = time();
       $req->key = $this->config['api_key'];
       $req->token = $this->config['api_secret'];
       $req->server = $this->config['server_ident'];
       $req->alert = $this->config['server_email'];
+      $req->request = new stdClass();
       $req->request->$apiIndex->filehash = $fname;
       $req->request->$apiIndex->curhash = $hash;
       $req->request->$apiIndex->filename = $file;
@@ -119,10 +120,11 @@ class changedbinariesRemote{
       // Build the request
       $req = new stdClass();
       $req->action = 'upd';
-      $req->request = new stdClass();
+      $req->requesttime = time();
       $req->key = $this->config['api_key'];
       $req->server = $this->config['server_ident'];
       $req->token = $this->token;
+      $req->request = new stdClass();
       $req->request->$apiIndex->filehash = $fname;
       $req->request->$apiIndex->curhash = $hash;
       $req->request->$apiIndex->filename = $file;

@@ -249,6 +249,13 @@ $cbins->notify->debug('Called with arguments'.$argv[0]);
 
 $cbins->getpath();
 
+// Make sure we check our own integrity 
+$cbins->notify->debug('Adding self to checkpath');
+$cbins->setadditional(dirname(__FILE__)."/../lib/");
+$cbins->addfile(__FILE__);
+
+
+
 /** If CPanel or Plesk are installed, we want to check them too - not always in PATH
 */
 if (is_dir('/usr/local/cpanel/bin/')){
@@ -260,29 +267,23 @@ if (is_dir('/usr/local/psa/bin/')){
 }
 
 
-// Make sure we check our own integrity 
-$cbins->notify->debug('Adding self to checkpath');
-$cbins->setadditional(dirname(__FILE__)."/../lib/");
-$cbins->addfile(__FILE__);
-
-
 // Load any additional files
 if (file_exists(dirname(__FILE__)."/../config/additional_files.cfg")){
   $lines = file(dirname(__FILE__)."/../config/additional_files.cfg");
 
   foreach($lines as $line){
-    if (strpos($line,"#") !== false || strpos($line,"/") === false){
-      continue;
-    }
-    $line = trim($line);
+      if (strpos($line,"#") !== false || strpos($line,"/") === false){
+	continue;
+      }
+      $line = trim($line);
 
-    $cbins->notify->debug('Adding '.$line.' to checkpath');
-    if (is_dir($line)){
-      $cbins->setadditional($line);
-      continue;
-    }
+      $cbins->notify->debug('Adding '.$line.' to checkpath');
+      if (is_dir($line)){
+	$cbins->setadditional($line);
+	continue;
+      }
 
-    $cbins->addfile($line);
+      $cbins->addfile($line);
   }
 
 }

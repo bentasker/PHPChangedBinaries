@@ -17,6 +17,7 @@ class changedbinariesRemote{
     protected $enabled;
     protected $config;
     protected $token;
+    protected $sessid;
     var $notify;
 
 
@@ -25,6 +26,38 @@ class changedbinariesRemote{
       $this->enabled = $remote_store_enabled;
       $this->config = $config;
       $this->notify = $notify;
+
+      if ($this->enabled){
+	if (!$this->openAuditSession()){
+	  return false;
+	}
+      }
+
+    }
+
+
+
+    /** Open a session and set the session ID
+    *
+    */
+    function openAuditSession(){
+      $req = new stdClass();
+      $req->action = 'start';
+      $req->requesttime = time();
+      $req->key = $this->config['api_key'];
+      $req->token = $this->config['api_secret'];
+      $req->server = $this->config['server_ident'];
+      $req->alert = $this->config['server_email'];
+      $request = json_encode($req);
+      $this->notify->debug("Attempting to open Audit session");
+      $resp = $this->placeRequest($request);
+
+      if (!$resp || $resp->status != 'ok'){
+	$this->notify->warning("Could not open audit session");
+	return false;
+      }
+      $this->sessid = $resp->response->session;
+
     }
 
 
@@ -53,6 +86,7 @@ class changedbinariesRemote{
       $req->token = $this->config['api_secret'];
       $req->server = $this->config['server_ident'];
       $req->alert = $this->config['server_email'];
+      $req->session = $this->sessid;
       $req->request = new stdClass();
       $req->request->$apiIndex->filehash = $fname;
       $req->request->$apiIndex->curhash = $hash;
@@ -124,6 +158,7 @@ class changedbinariesRemote{
       $req->key = $this->config['api_key'];
       $req->server = $this->config['server_ident'];
       $req->token = $this->token;
+      $req->session = $this->sessid;
       $req->request = new stdClass();
       $req->request->$apiIndex->filehash = $fname;
       $req->request->$apiIndex->curhash = $hash;

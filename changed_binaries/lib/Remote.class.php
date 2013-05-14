@@ -279,32 +279,14 @@ class changedbinariesRemote{
 	  return true;
     }
 
+    /** TODO: Use returned stats
+    *
+    */
     function __destruct(){
       $this->closeAuditSession();
     }
 
 
 }
-
-
-/** Updates authentication plan
-
-When creating the API key user is asked to specify a password - $pass
-Shared secret is created $secret
-Server secret1 is created $serv_secret
-Server secret2 is created $serv_secret2
-API Token is generated as follows
-
-Might change the cipher though
-
-$secret = openssl_encrypt($serv_secret,'des-cbc',$serv_secret2.$pass);
-$secret = openssl_encrypt($secret,'des-cbc',$pass);
-
-
-When updating, user is asked for their password. This is used to decrypt the first wrapper (so never sent to the server)
-the output is then submitted to the server, which decrypts it to ensure that the final key is correct. 
-
-*/
-
 
 ?>

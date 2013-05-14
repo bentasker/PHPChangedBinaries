@@ -282,7 +282,7 @@ class changedbinariesRemote{
 	  if ($value->updated == 1){
 	    $this->notify->info("Hash for {$value->filename} updated");
 	  }else{
-	    $this->notify->warning("Hash for {$value->filename} not updated, but API didn't raise an error");
+	    $this->notify->warning("Hash for {$value->filename} not updated, but API didn't raise an error - likely database issue");
 	  }
       }
 	return 'RESPRECEIVED';

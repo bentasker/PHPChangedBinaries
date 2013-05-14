@@ -18,6 +18,9 @@ class changedbinariesRemote{
     protected $config;
     protected $token;
     protected $sessid;
+    protected $request;
+    protected $blocksize;
+    protected $apimethod;
     var $notify;
 
 
@@ -26,6 +29,9 @@ class changedbinariesRemote{
       $this->enabled = $remote_store_enabled;
       $this->config = $config;
       $this->notify = $notify;
+      $this->request = new stdClass();
+      $this->request->request = new stdClass();
+      $this->blocksize = 0;
 
       if ($this->enabled){
 	if (!$this->openAuditSession()){
@@ -100,44 +106,80 @@ class changedbinariesRemote{
 
       $this->notify->debug("Building request");
       // Build the request
-      $req = new stdClass();
-      $req->action = 'check';
-      $req->requesttime = time();
-      $req->key = $this->config['api_key'];
-      $req->token = $this->config['api_secret'];
-      $req->server = $this->config['server_ident'];
-      $req->session = $this->sessid;
-      $req->request = new stdClass();
-      $req->request->$apiIndex->filehash = $fname;
-      $req->request->$apiIndex->curhash = $hash;
-      $req->request->$apiIndex->filename = $file;
-      $request = json_encode($req);
+      
+      $this->request->request->$apiIndex->filehash = $fname;
+      $this->request->request->$apiIndex->curhash = $hash;
+      $this->request->request->$apiIndex->filename = $file;
 
+      // Increase the blocksize count
+      $this->blocksize++;
+      
+      // Should we trigger the request?
+      if ($this->blocksize == $this->config['processblock']){
+	$this->blocksize = 0;
+	return $this->processCheck();
+      }
+
+      // Return true so we don't trigger the local db checks
+      return array(true,null);
+
+    }
+
+
+
+    /** Send a check request to the server
+    *
+    */
+    function processCheck(){
+      
+      $this->apimethod='Check';
+
+      // Finish building the request
+      $this->request->action = 'check';
+      $this->request->requesttime = time();
+      $this->request->key = $this->config['api_key'];
+      $this->request->token = $this->config['api_secret'];
+      $this->request->server = $this->config['server_ident'];
+      $this->request->session = $this->sessid;
+
+      // Encode the request
+      $request = json_encode($this->request);
       $this->notify->debug("Request is $request");
-
+      
       // Place the request
       $resp = $this->placeRequest($request);
-      
+
+
       // Check the response
       if (!$resp){
-	$this->notify->warning("API Request for $file failed");
+	$this->notify->warning("API Request failed");
 	return array('CONNECTFAIL',null);
       }
 
+      // We got something back, so let's check the status
       $resp = json_decode($resp);
       if ($resp->status != 'ok'){
 	$this->notify->warning("{$resp->status}: {$resp->error}");
 	return array("APIERROR",null);
       }
       
+      // Cycle through all hashes in the response
+      foreach ($resp->response as $key=>$value){
 
-      if ($resp->response->$apiIndex->match == 1){
-	$this->notify->info("$file unchanged since last update");
-	return array("RESPRECEIVED",null);
-      }else{
-	$this->notify->alarm("$file has changed");
-	return array("RESPRECEIVED",null);
+	  if ($value->match == 1){
+	    $this->notify->info("{$value->filename} unchanged since last update");
+	  }elseif($value->match == 2){
+	    // No stored hash
+	    $this->notify->warning("{$value->filename} has no stored hash");
+	  }else{
+	    // The hash we calculated doesn't match - somethings changed
+	    $this->notify->alarm("{$value->filename} has changed");
+	  }
+
       }
+
+      // Return a positive status
+      return array("SUCCESS",$resp->response);
       
     }
 
@@ -244,6 +286,7 @@ class changedbinariesRemote{
 
 	$this->response = curl_exec($ch);
 	curl_close($ch);
+	
 	$this->notify->debug("Server response: {$this->response}");
 	return $this->response;
     
@@ -283,6 +326,13 @@ class changedbinariesRemote{
     *
     */
     function __destruct(){
+      
+      // Make sure we haven't got unprocessed requests left in the block
+      if ($this->blocksize != 0){
+	$fn = "process".$this->apimethod;
+	$this->$fn();
+      }
+
       $this->closeAuditSession();
     }
 

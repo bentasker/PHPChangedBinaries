@@ -214,29 +214,50 @@ class changedbinariesRemote{
       $this->notify->debug("Building request");
 
       // Build the request
-      $req = new stdClass();
-      $req->action = 'upd';
-      $req->requesttime = time();
-      $req->key = $this->config['api_key'];
-      $req->server = $this->config['server_ident'];
-      $req->token = $this->token;
-      $req->session = $this->sessid;
-      $req->request = new stdClass();
-      $req->request->$apiIndex->filehash = $fname;
-      $req->request->$apiIndex->curhash = $hash;
-      $req->request->$apiIndex->filename = $file;
-      $request = json_encode($req);
 
+      $this->request->request->$apiIndex->filehash = $fname;
+      $this->request->request->$apiIndex->curhash = $hash;
+      $this->request->request->$apiIndex->filename = $file;
+      
+
+      // Should we trigger the request?
+      if ($this->blocksize == $this->config['processblock']){
+	$this->blocksize = 0;
+	return $this->processUpdate();
+      }
+
+      
+
+    }
+
+
+
+    /** Process an update request
+    *
+    */
+    function processUpdate(){
+      $this->apimethod='Update';
+
+      $this->request->action = 'upd';
+      $this->request->requesttime = time();
+      $this->request->key = $this->config['api_key'];
+      $this->request->server = $this->config['server_ident'];
+      $this->request->token = $this->token;
+      $this->request->session = $this->sessid;
+
+
+      $request = json_encode($this->request);
       // Place the request
       $this->notify->debug("Request is $request");
       $resp = $this->placeRequest($request);
       
       // Check the response
       if (!$resp){
-	$this->notify->warning("API Request for $file failed");
+	$this->notify->warning("API Request failed");
 	return 'CONNECTFAIL';
       }
 
+      // We got something back
       $resp = json_decode($resp);
 
       if ($resp->status != 'ok' && $resp->status != 'autherror'){
@@ -255,15 +276,17 @@ class changedbinariesRemote{
 
       }
 
-      if ($resp->response->$apiIndex->updated == 1){
-	$this->notify->info("Hash for $file updated");
-      }else{
-	$this->notify->warning("Hash for $file not updated, but API didn't raise an error");
+
+      // Now we need to check the hash responses
+      foreach($resp->response as $key=>$value){
+	  if ($value->updated == 1){
+	    $this->notify->info("Hash for {$value->filename} updated");
+	  }else{
+	    $this->notify->warning("Hash for {$value->filename} not updated, but API didn't raise an error");
+	  }
       }
 	return 'RESPRECEIVED';
-
     }
-
 
 
 
@@ -286,7 +309,6 @@ class changedbinariesRemote{
 
 	$this->response = curl_exec($ch);
 	curl_close($ch);
-	
 	$this->notify->debug("Server response: {$this->response}");
 	return $this->response;
     
@@ -321,6 +343,8 @@ class changedbinariesRemote{
       }
 	  return true;
     }
+
+
 
     /** TODO: Use returned stats
     *

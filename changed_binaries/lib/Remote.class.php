@@ -83,7 +83,13 @@ class changedbinariesRemote{
 	$this->notify->warning("Could not close audit session");
 	return false;
       }
-
+      
+      $this->notify->info(" ");
+      $this->notify->info("Audit session {$resp->response->stats->checkID} closed");
+      $this->notify->info("{$resp->response->stats->checked} hashes processed");
+      $this->notify->info("{$resp->response->stats->secalerts} Security Alerts");
+      $this->notify->info("{$resp->response->stats->alerts} Alerts");
+      $this->notify->info("{$resp->response->stats->warnings} Warnings");
       unset($this->sessid);
     }
 
@@ -100,6 +106,8 @@ class changedbinariesRemote{
 	return array(false,null);
       }
       $this->notify->debug("Attempting to retrieve hash from RemoteStore");
+
+      $this->apimethod='Check';
 
       $fname = sha1($file);
       $apiIndex = "A$fname";
@@ -132,7 +140,7 @@ class changedbinariesRemote{
     */
     function processCheck(){
       
-      $this->apimethod='Check';
+      
 
       // Finish building the request
       $this->request->action = 'check';
@@ -199,7 +207,7 @@ class changedbinariesRemote{
       }
 
       $this->notify->debug("Attempting to update hash in RemoteStore");
-
+      $this->apimethod='Update';
       $fname = sha1($file);
 
       // We prefix with an A to ensure it never starts with a number!
@@ -219,6 +227,7 @@ class changedbinariesRemote{
       $this->request->request->$apiIndex->curhash = $hash;
       $this->request->request->$apiIndex->filename = $file;
       
+      $this->blocksize++;
 
       // Should we trigger the request?
       if ($this->blocksize == $this->config['processblock']){
@@ -236,7 +245,7 @@ class changedbinariesRemote{
     *
     */
     function processUpdate(){
-      $this->apimethod='Update';
+      
 
       $this->request->action = 'upd';
       $this->request->requesttime = time();

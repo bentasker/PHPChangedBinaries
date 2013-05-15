@@ -25,6 +25,7 @@ class changedbinariesmain{
     protected $action;
     protected $files = array();
     var $notify;
+    
 
 
     function __construct(){
@@ -290,7 +291,7 @@ if (file_exists(dirname(__FILE__)."/../config/additional_files.cfg")){
 
 
 // Check what we need to do
-if ($argv[1] == "-upd"){
+if (in_array("--upd",$argv)){
 
   if ($cbins->getInput("Enter YES if you're sure all files are unmodified") == "YES"){
 
@@ -301,13 +302,20 @@ if ($argv[1] == "-upd"){
     die;
   }
 
-}elseif($argv[1] == '-updfile'){
+}
+
+$f = array_search('--updfile',$argv);
+
+if ($f !== false){
 
   // Update hash for a single file
-  $file = $argv[2];
+  $idx = $f+1;
+  $file = $argv[$idx];
 
   if (file_exists($file)){
-    $cbins->storeHash($file);
+    $cbins->setaction('store');
+    $cbins->checkfile($file);
+    die;
   }else{
     echo "File does not exist";
   }

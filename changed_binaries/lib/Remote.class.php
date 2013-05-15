@@ -21,6 +21,7 @@ class changedbinariesRemote{
     protected $request;
     protected $blocksize;
     protected $apimethod;
+    protected $apiserver;
     var $notify;
 
 
@@ -28,6 +29,7 @@ class changedbinariesRemote{
       require dirname(__FILE__)."/../config/remotehashes.php";
       $this->enabled = $remote_store_enabled;
       $this->config = $config;
+      $this->apiserver = $config['api_server'];
       $this->notify = $notify;
       $this->request = new stdClass();
       $this->request->request = new stdClass();
@@ -41,6 +43,13 @@ class changedbinariesRemote{
 
     }
 
+
+    /** Return whether we're enabled or not
+    *
+    */
+    function isenabled(){
+      return $this->enabled;
+    }
 
 
     /** Open a session and set the session ID
@@ -311,7 +320,7 @@ class changedbinariesRemote{
 	$fields_string = 'data='.urlencode($request);
 	$this->notify->debug("Posting request to {$this->config['api_server']}");
 	$ch = curl_init();
-	curl_setopt($ch,CURLOPT_URL, $this->config['api_server']);
+	curl_setopt($ch,CURLOPT_URL, $this->apiserver);
 	curl_setopt($ch,CURLOPT_POST, 1);
 	curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
 	curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
@@ -355,9 +364,6 @@ class changedbinariesRemote{
 
 
 
-    /** TODO: Use returned stats
-    *
-    */
     function __destruct(){
       
       // Make sure we haven't got unprocessed requests left in the block

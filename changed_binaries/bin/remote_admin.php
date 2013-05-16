@@ -61,11 +61,23 @@ class changedbinariesmain{
       if (in_array("--addserver",$this->arguments)){
 	  // Call the add server function
 	  $this->addserver();
+      }elseif(in_array("--listservers",$this->arguments)){
+	  $this->listservers();
       }
-
-
     }
 
+
+    /** List servers recorded against an API Key
+    *
+    */
+    function listservers(){
+      $servers = $this->remote->listservers();
+
+      foreach ($servers as $server){
+	$this->notify->info("Server Name: {$server->serverRef}		Contact: {$server->contact}");
+      }
+      $this->notify->info(" ");
+    }
 
     
     function addserver(){
@@ -77,10 +89,12 @@ class changedbinariesmain{
       }
 
       $k = array_search("--addserver",$this->arguments);
-      $serverident = $this->arguments[$k+1];
-      $k = array_search("--addserver",$this->arguments);
-      $contact = $this->arguments[$k+1];
-
+      $k++;
+      $serverident = $this->arguments[$k];
+      $k = array_search("--email",$this->arguments);
+      $k++;      
+      $contact = $this->arguments[$k];
+      
       $this->remote->addserver($serverident,$contact);
 
 

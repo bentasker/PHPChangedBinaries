@@ -94,11 +94,15 @@ class changedbinariesRemote{
       }
       
       $this->notify->info(" ");
-      $this->notify->info("Audit session {$resp->response->stats->checkID} closed");
-      $this->notify->info("{$resp->response->stats->checked} hashes processed");
-      $this->notify->info("{$resp->response->stats->secalerts} Security Alerts");
-      $this->notify->info("{$resp->response->stats->alerts} Alerts");
-      $this->notify->info("{$resp->response->stats->warnings} Warnings");
+      
+
+      if ($resp->response->stats){
+	$this->notify->info("Audit session {$resp->response->stats->checkID} closed");
+	$this->notify->info("{$resp->response->stats->checked} hashes processed");
+	$this->notify->info("{$resp->response->stats->secalerts} Security Alerts");
+	$this->notify->info("{$resp->response->stats->alerts} Alerts");
+	$this->notify->info("{$resp->response->stats->warnings} Warnings");
+      }
       unset($this->sessid);
     }
 

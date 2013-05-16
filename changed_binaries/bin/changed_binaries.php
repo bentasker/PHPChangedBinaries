@@ -11,11 +11,11 @@
 */
 
 error_reporting(E_ALL);
-
+define('_PROGPATH',dirname(__FILE__)."/../");
 
 // Load the dependencies
-require_once('../lib/notify.class.php');
-require_once('../lib/Remote.class.php');
+require_once(_PROGPATH.'lib/notify.class.php');
+require_once(_PROGPATH.'lib/Remote.class.php');
 
 
 

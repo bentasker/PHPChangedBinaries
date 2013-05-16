@@ -26,7 +26,7 @@ class changedbinariesRemote{
 
 
     function __construct(&$notify){
-      require dirname(__FILE__)."/../config/remotehashes.php";
+      require _PROGPATH."config/remotehashes.php";
       $this->enabled = $remote_store_enabled;
       $this->config = $config;
       $this->apiserver = $config['api_server'];

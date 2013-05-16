@@ -21,7 +21,7 @@ class changedbinariesNotify{
 
 
   function __construct(){
-    require dirname(__FILE__)."/../config/notifications.php";
+    require _PROGPATH."config/notifications.php";
     $this->config = $notify;
   }
 

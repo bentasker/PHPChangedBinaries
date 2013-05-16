@@ -42,6 +42,12 @@ class changedbinariesmain{
       $path = getenv("PATH");
       $this->notify->debug('Adding Path ('.$path.') to check');
       $this->path = explode(":",$path);
+
+      // Add the PHP libraries directory
+      $libraries = explode(":",ini_get('include_path'));
+
+      $this->path = array_merge($libraries,$this->path);
+
       return $this->path;
     }
 

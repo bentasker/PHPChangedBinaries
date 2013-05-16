@@ -19,6 +19,7 @@ class changedbinariesRemoteAdmin extends changedbinariesRemote{
       $old = $this->apiserver;
       $this->apiserver .= 'admin/';
       $this->getauthToken();
+      passthru('clear');
 
 
       $request->action = 'listservers';
@@ -59,6 +60,7 @@ class changedbinariesRemoteAdmin extends changedbinariesRemote{
       $old = $this->apiserver;
       $this->apiserver .= 'admin/';
       $this->getauthToken();
+      passthru('clear');
 
 
       $request->action = 'addserver';

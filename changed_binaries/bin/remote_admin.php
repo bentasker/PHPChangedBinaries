@@ -58,6 +58,10 @@ class changedbinariesmain{
       }
 
       
+      if (in_array("--rmserver",$this->arguments)){
+	  $this->rmserver();
+      }
+
       if (in_array("--addserver",$this->arguments)){
 	  // Call the add server function
 	  $this->addserver();
@@ -67,9 +71,7 @@ class changedbinariesmain{
 	  $this->listservers();
       }
       
-      if (in_array("--rmserver",$this->arguments)){
-	  $this->rmserver();
-      }
+
     }
 
 

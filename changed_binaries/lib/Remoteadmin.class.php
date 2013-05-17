@@ -16,16 +16,32 @@
 class changedbinariesRemoteAdmin extends changedbinariesRemote{
 
 
+
+    function __construct(&$notify){
+      require _PROGPATH."config/remotehashes.php";
+      $this->enabled = $remote_store_enabled;
+      $this->config = $config;
+      $this->apiserver = $config['api_server']."/admin/";
+      $this->notify = $notify;
+      $this->request = new stdClass();
+      $this->request->request = new stdClass();
+      $this->blocksize = 0;
+
+      if ($this->enabled){
+	if (!$this->openAuditSession()){
+	  return false;
+	}
+      }
+
+    }
+
+
     /** List all servers listed against the API Key
     *
     */
     function listservers(){
-      $old = $this->apiserver;
-      $this->apiserver .= 'admin/';
+;
       $this->getauthToken();
-
-
-
       $request->action = 'listservers';
 
       $request->requesttime = time();
@@ -37,9 +53,6 @@ class changedbinariesRemoteAdmin extends changedbinariesRemote{
 
       $resp = $this->placeRequest(json_encode($request));
 
-
-
-      $this->apiserver = $old;
       if (!$resp){
 	$this->notify->warning("API Error");
 	return false;
@@ -65,9 +78,6 @@ class changedbinariesRemoteAdmin extends changedbinariesRemote{
     *
     */
     function rmserver($serverident){
-
-     $old = $this->apiserver;
-      $this->apiserver .= 'admin/';
       $this->getauthToken();
 
 
@@ -83,7 +93,6 @@ class changedbinariesRemoteAdmin extends changedbinariesRemote{
 
       $resp = $this->placeRequest(json_encode($request));
 
-      $this->apiserver = $old;
       if (!$resp){
 	$this->notify->warning("API Error");
 	return;
@@ -106,12 +115,7 @@ class changedbinariesRemoteAdmin extends changedbinariesRemote{
     *
     */
     function addserver($serverident,$contact){
-      $old = $this->apiserver;
-      $this->apiserver .= 'admin/';
       $this->getauthToken();
-
-
-
       $request->action = 'addserver';
 
       $request->requesttime = time();
@@ -126,7 +130,6 @@ class changedbinariesRemoteAdmin extends changedbinariesRemote{
 
       $resp = $this->placeRequest(json_encode($request));
 
-      $this->apiserver = $old;
       if (!$resp){
 	$this->notify->warning("API Error");
 	return;

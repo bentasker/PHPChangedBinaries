@@ -336,7 +336,6 @@ class changedbinariesRemote{
 	curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
 
 	$this->response = curl_exec($ch);
-echo $this->response;
 	curl_close($ch);
 	$this->notify->debug("Server response: {$this->response}");
 	return $this->response;

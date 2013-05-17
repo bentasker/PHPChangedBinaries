@@ -57,6 +57,9 @@ class changedbinariesmain{
 	return false;
       }
 
+      if (in_array("--addkey",$this->arguments)){
+	$this->addKey();
+      }
       
       if (in_array("--rmserver",$this->arguments)){
 	  $this->rmserver();
@@ -102,7 +105,20 @@ class changedbinariesmain{
       $this->listservers();
     }
 
-    
+
+    /** Add the authkey
+    *
+    */
+    function addKey(){
+      $k = array_search("--addkey",$this->arguments);
+      $k++;
+      $key = $this->arguments[$k];
+
+      $fh = fopen(_PROGPATH.'config/authkey','w');
+      fwrite($fh,$key);
+      fclose($fh);
+    }
+
 
     /** Add a server
     *

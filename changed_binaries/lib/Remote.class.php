@@ -337,6 +337,7 @@ class changedbinariesRemote{
 
 	$this->response = curl_exec($ch);
 	curl_close($ch);
+echo $this->response ."\n\n";
 	$this->notify->debug("Server response: {$this->response}");
 	return $this->response;
     
@@ -366,10 +367,10 @@ class changedbinariesRemote{
 	  $this->notify->debug("Decrypting key");
 	  $str = implode("\n",file(dirname(__FILE__)."/../config/authkey"));
 	  $this->token = openssl_decrypt($str,'des-cbc',$pass);
-	  
+	  return true;
 	
       }
-	  return true;
+	  return 'GOTITALREADY';
     }
 
 

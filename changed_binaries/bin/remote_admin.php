@@ -61,8 +61,14 @@ class changedbinariesmain{
       if (in_array("--addserver",$this->arguments)){
 	  // Call the add server function
 	  $this->addserver();
-      }elseif(in_array("--listservers",$this->arguments)){
+      }
+
+      if(in_array("--listservers",$this->arguments)){
 	  $this->listservers();
+      }
+      
+      if (in_array("--rmserver",$this->arguments)){
+	  $this->rmserver();
       }
     }
 
@@ -79,7 +85,26 @@ class changedbinariesmain{
       $this->notify->info(" ");
     }
 
+
+
+    /** Remove the specified server
+    *
+    */
+    function rmserver(){
+      $k = array_search("--rmserver",$this->arguments);
+      $k++;
+      $ident = $this->arguments[$k];
+      $this->remote->rmserver($ident);
+
+      // Having added the server, let's list the remaining ones
+      $this->listservers();
+    }
+
     
+
+    /** Add a server
+    *
+    */
     function addserver(){
 
       if (!in_array("--email",$this->arguments)){
@@ -96,6 +121,9 @@ class changedbinariesmain{
       $contact = $this->arguments[$k];
       
       $this->remote->addserver($serverident,$contact);
+
+      // Having added the server, let's list them
+      $this->listservers();
 
 
     }

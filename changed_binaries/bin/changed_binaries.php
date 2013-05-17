@@ -90,7 +90,7 @@ class changedbinariesmain{
     *
     */
     function checkfiles($dir){
-      if (!is_dir($dir) || !$h = opendir($dir)){
+      if (!is_dir($dir) || $dir=='.' || !$h = opendir($dir)){
 	return false;
       }
 

@@ -71,6 +71,7 @@ class changedbinariesRemote{
 	return false;
       }
       $this->sessid = $resp->response->session;
+      $this->notify->info("Session {$this->sessid} opened");
 
     }
 
@@ -92,12 +93,11 @@ class changedbinariesRemote{
 	$this->notify->warning("Could not close audit session");
 	return false;
       }
-      
+      $this->notify->info("Session {$this->sessid} Closed");
       $this->notify->info(" ");
       
 
       if ($resp->response->stats){
-	$this->notify->info("Audit session {$resp->response->stats->checkID} closed");
 	$this->notify->info("{$resp->response->stats->checked} hashes processed");
 	$this->notify->info("{$resp->response->stats->secalerts} Security Alerts");
 	$this->notify->info("{$resp->response->stats->alerts} Alerts");
@@ -138,7 +138,10 @@ class changedbinariesRemote{
       // Should we trigger the request?
       if ($this->blocksize == $this->config['processblock']){
 	$this->blocksize = 0;
-	return $this->processCheck();
+	$res = $this->processCheck();
+	unset($this->request->request);
+	$this->request->request = new stdClass();
+	return $res;
       }
 
       // Return true so we don't trigger the local db checks
@@ -245,7 +248,10 @@ class changedbinariesRemote{
       // Should we trigger the request?
       if ($this->blocksize == $this->config['processblock']){
 	$this->blocksize = 0;
-	return $this->processUpdate();
+	$res = $this->processUpdate();
+	unset($this->request->request);
+	$this->request->request = new stdClass();
+	return $res;
       }
 
       

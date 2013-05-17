@@ -22,7 +22,7 @@ class changedbinariesRemoteAdmin extends changedbinariesRemote{
     function listservers(){
       $old = $this->apiserver;
       $this->apiserver .= 'admin/';
-      $this->getPass();
+      $this->getauthToken();
 
 
 
@@ -58,15 +58,6 @@ class changedbinariesRemoteAdmin extends changedbinariesRemote{
     }
 
 
-    function getPass(){
-      $this->getauthToken();
-      passthru('clear');
-      
-
-
-    }
-
-
 
     /** Remove the specified server
     *
@@ -77,7 +68,7 @@ class changedbinariesRemoteAdmin extends changedbinariesRemote{
 
      $old = $this->apiserver;
       $this->apiserver .= 'admin/';
-      $this->getPass();
+      $this->getauthToken();
 
 
       $request->action = 'rmserver';
@@ -117,7 +108,7 @@ class changedbinariesRemoteAdmin extends changedbinariesRemote{
     function addserver($serverident,$contact){
       $old = $this->apiserver;
       $this->apiserver .= 'admin/';
-      $this->getPass();
+      $this->getauthToken();
 
 
 

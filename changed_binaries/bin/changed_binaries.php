@@ -295,7 +295,7 @@ if (file_exists(dirname(__FILE__)."/../config/additional_files.cfg")){
 
 }
 
-
+$f = array_search('--updfile',$argv);
 // Check what we need to do
 if (in_array("--upd",$argv)){
 
@@ -308,11 +308,7 @@ if (in_array("--upd",$argv)){
     die;
   }
 
-}
-
-$f = array_search('--updfile',$argv);
-
-if ($f !== false){
+}elseif ($f !== false){
 
   // Update hash for a single file
   $idx = $f+1;

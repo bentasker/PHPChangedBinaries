@@ -114,7 +114,7 @@ class changedbinariesRemoteAdmin extends changedbinariesRemote{
     /** Send a request to the API to add a new server
     *
     */
-    function addserver($serverident,$contact){
+    function addserver($serverident,$contact,$checkin=null){
       $this->getauthToken();
       $request->action = 'addserver';
 
@@ -124,7 +124,7 @@ class changedbinariesRemoteAdmin extends changedbinariesRemote{
       $request->token = $this->token;
       $request->session = $this->sessid;
 
-      
+      $request->request->checkin = $checkin;
       $request->request->serverid = $serverident;
       $request->request->contact = $contact;	
 
@@ -145,6 +145,45 @@ class changedbinariesRemoteAdmin extends changedbinariesRemote{
       $this->notify->info("Server with Ident {$resp->response->serverid} added");
 	  
     }
+
+
+
+    /** Send a request to the API to add a new server
+    *
+    */
+    function editserver($serverident,$contact,$checkin,$newident){
+      $this->getauthToken();
+      $request->action = 'editserver';
+
+      $request->requesttime = time();
+      $request->key = $this->config['api_key'];
+      $request->server = $this->config['server_ident'];
+      $request->token = $this->token;
+      $request->session = $this->sessid;
+
+      $request->request->checkin = $checkin;
+      $request->request->serverid = $serverident;
+      $request->request->contact = $contact;	
+      $request->request->newident = $newident;
+
+      $resp = $this->placeRequest(json_encode($request));
+
+      if (!$resp){
+	$this->notify->warning("API Error");
+	return;
+      }
+
+      $resp = json_decode($resp);
+
+      if ($resp->status != 'ok'){
+	$this->notify->warning("{$resp->status}: {$resp->error}");
+	return;
+      }
+
+      $this->notify->info("Server with Ident {$resp->response->serverid} edited.");
+	  
+    }
+
 
 
 

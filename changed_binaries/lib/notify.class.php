@@ -71,7 +71,7 @@ class changedbinariesNotify{
     $secalerts = count($this->secalerts);
 
     $msg = date('Y-m-d H:i:s') . ": Changed Binaries output follows\n".
-	  $secalerts . " Security alerts".
+	  $secalerts . " Security alerts\n".
 	  count($this->alarms) . " Alarms\n" . count($this->warnings) . " Warnings\n" . count($this->infos) . " Information messages\n\n";
 
     if ($secalerts > 0){

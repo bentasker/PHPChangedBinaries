@@ -85,7 +85,7 @@ class changedbinariesmain{
       $servers = $this->remote->listservers();
 
       foreach ($servers as $server){
-	$this->notify->info("Server Name: {$server->serverRef}		Contact: {$server->contact}");
+	$this->notify->info("Server Name: {$server->serverRef}		Contact: {$server->contact}	Minimum Checkin: {$server->checkfreq} days");
       }
       $this->notify->info(" ");
     }
@@ -131,6 +131,14 @@ class changedbinariesmain{
 	return false;
       }
 
+
+      if ($k = array_search("--checkin",$this->arguments)){
+	$k++;
+	$checkin = $this->arguments[$k];
+      }else{
+	$checkin = 7;
+      }
+
       $k = array_search("--addserver",$this->arguments);
       $k++;
       $serverident = $this->arguments[$k];
@@ -138,13 +146,56 @@ class changedbinariesmain{
       $k++;      
       $contact = $this->arguments[$k];
       
-      $this->remote->addserver($serverident,$contact);
+      $this->remote->addserver($serverident,$contact,$checkin);
 
       // Having added the server, let's list them
       $this->listservers();
 
 
     }
+
+
+    /** Add a server
+    *
+    */
+    function editserver(){
+
+      if (!$k = array_search("--email",$this->arguments)){
+	$email = '';
+      }else{
+	$k++;      
+	$contact = $this->arguments[$k];
+      }
+
+      if ($k = array_search("--checkin",$this->arguments)){
+	$k++;
+	$checkin = $this->arguments[$k];
+      }else{
+	$checkin = '';
+      }
+
+
+      if ($k = array_search("--newname",$this->arguments)){
+	$k++;
+	$newident = $this->arguments[$k];
+      }else{
+	$newident = '';
+      }
+
+
+      $k = array_search("--editserver",$this->arguments);
+      $k++;
+      $serverident = $this->arguments[$k];
+      
+      $this->remote->editserver($serverident,$contact,$checkin,$newident);
+
+      // Having added the server, let's list them
+      $this->listservers();
+
+
+    }
+
+
 
 
     /** Output usage information

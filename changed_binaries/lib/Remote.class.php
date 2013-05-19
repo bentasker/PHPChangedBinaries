@@ -234,7 +234,7 @@ class changedbinariesRemote{
 	// We couldn't load it. Don't return false as we don't want to fall back on the local db
 	return 'KEYFAIL';
       }
-      passthru('clear');
+      
       $this->notify->debug("Building request");
 
       // Build the request

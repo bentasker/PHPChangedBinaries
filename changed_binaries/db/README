@@ -1,0 +1,1 @@
+This directory exists to store a simple flatfile database of file hashes. It'll be empty if you're using RemoteHashStore

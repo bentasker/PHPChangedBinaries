@@ -4,6 +4,8 @@
 * @author B Tasker
 * @copyright B Tasker 2013
 * 
+* http://www.bentasker.co.uk/documentation/security/197-remotehashstore-documentation
+*
 * @license GNU GPL V2 - See LICENSE
 *
 * Allows for adjustment of settings in the RemoteHashes API

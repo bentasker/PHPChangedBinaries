@@ -3,6 +3,8 @@
 *
 * @author B Tasker
 * @copyright B Tasker 2013
+*
+* http://www.bentasker.co.uk/documentation/security/196-php-changed-binaries
 * 
 * @license GNU GPL V2 - See LICENSE
 *

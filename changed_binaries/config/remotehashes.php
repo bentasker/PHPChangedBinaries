@@ -15,9 +15,9 @@
 
 
 $remote_store_enabled = true;
-$config['api_server'] = 'http://benscomputer.no-ip.org/changedbinaries/';
-$config['api_key'] = '9ee82cdd69c32aad0ed16598c034ede2625a0eae';
-$config['server_ident'] = 'Rimmer';
+$config['api_server'] = 'http://api.bentasker.co.uk/changedbinaries/';
+$config['api_key'] = '';
+$config['server_ident'] = '';
 
 // How many hashes should we send to the API at once?
 $config['processblock'] = 100;

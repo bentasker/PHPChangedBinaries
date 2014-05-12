@@ -12,7 +12,7 @@
 *
 */
 
-error_reporting(E_ALL);
+error_reporting(0);
 define('_PROGPATH',dirname(__FILE__)."/../");
 
 // Load the dependencies

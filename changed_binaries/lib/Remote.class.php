@@ -192,14 +192,20 @@ class changedbinariesRemote{
       // Cycle through all hashes in the response
       foreach ($resp->response as $key=>$value){
 
-	  if ($value->match == 1){
-	    $this->notify->info("{$value->filename} unchanged since last update");
-	  }elseif($value->match == 2){
-	    // No stored hash
-	    $this->notify->warning("{$value->filename} has no stored hash");
-	  }else{
-	    // The hash we calculated doesn't match - somethings changed
-	    $this->notify->alarm("{$value->filename} has changed");
+	  switch ($value->match){
+		case 1:
+		    $this->notify->info("{$value->filename} unchanged since last update");
+		    break;
+	  	case 2:
+	    	    $this->notify->warning("{$value->filename} has no stored hash");
+		    break;
+	  	case 3:
+   		    $this->notify->info("{$value->filename} has been set to ignore (but has changed since last update)");
+		    break;
+
+	  	default:
+		   // The hash we calculated doesn't match - somethings changed
+		   $this->notify->alarm("{$value->filename} has changed");
 	  }
 
       }

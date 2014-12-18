@@ -24,6 +24,7 @@ class changedbinariesRemote{
     protected $blocksize;
     protected $apimethod;
     protected $apiserver;
+    protected $requestsig;
     var $notify;
 
 
@@ -289,7 +290,7 @@ class changedbinariesRemote{
       
       // Check the response
       if (!$resp){
-	$this->notify->warning("API Request failed");
+	$this->notify->warning("API Request failed (Signature ".$this->requestsig.")");
 	return 'CONNECTFAIL';
       }
 
@@ -336,9 +337,13 @@ class changedbinariesRemote{
 
 	$fields_string ='';
 	$fields_string = 'data='.urlencode($request);
-	$this->notify->debug("Posting request to {$this->config['api_server']}");
+
+	$this->requestsig = sha1($fields_string.mt_rand(0,50000));
+
+
+	$this->notify->debug("Posting request to {$this->config['api_server']}?sig={$this->requestsig}");
 	$ch = curl_init();
-	curl_setopt($ch,CURLOPT_URL, $this->apiserver);
+	curl_setopt($ch,CURLOPT_URL, $this->apiserver."?sig={$this->requestsig}");
 	curl_setopt($ch,CURLOPT_POST, 1);
 	curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
 	curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);

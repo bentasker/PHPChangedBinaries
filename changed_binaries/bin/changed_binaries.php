@@ -223,13 +223,14 @@ class changedbinariesmain{
     */
     function init(){
 
-      foreach ($this->files as $file){
+      foreach ($this->files as $k=>$file){
 	  $this->checkfile($file);
+	  unset($this->files[$k]); // No point keeping the path in memory.
       }
 
-
-      foreach ($this->path as $path){
-      $this->checkfiles($path);
+      foreach ($this->path as $k=>$path){
+	  $this->checkfiles($path);
+	  unset($this->path[$k]); // No point keeping the path in memory.
       }
 
 

@@ -29,21 +29,27 @@ class changedbinariesNotify{
 
   function alarm($str){
     echo "ALERT: ".$str."\n";
-    $this->alarms[] = $str;
 
+    if ($this->config['alarm']){
+	$this->alarms[] = $str;
+    }
   }
 
 
   function warning($str){
     echo "WARN: ".$str."\n";
-    $this->warnings[] = $str;
+    if ($this->config['warning']){
+	$this->warnings[] = $str;
+    }
   }
 
 
 
   function info($str){
     echo $str."\n";
-    $this->infos[] = $str;
+    if ($this->config['info']){
+	$this->infos[] = $str;
+    }
   }
 
 

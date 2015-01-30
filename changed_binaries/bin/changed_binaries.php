@@ -95,7 +95,7 @@ class changedbinariesmain{
       if (!is_dir($dir) || $dir=='.' || !$h = opendir($dir)){
 	return false;
       }
-
+      
       while (false !== ($entry = readdir($h))){
 	if ($entry == '.' || $entry == '..'){
 	  continue;
@@ -122,6 +122,7 @@ class changedbinariesmain{
     *
     */
     function checkfile($file){
+      set_time_limit(60); // Make sure we don't hit any max execution limits
       $fn = $this->action."Hash";
       $this->notify->debug('Running  '.$fn.' on '.$file);
       $this->$fn($file);

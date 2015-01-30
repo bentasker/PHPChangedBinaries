@@ -71,9 +71,10 @@ class changedbinariesmain{
     */
     function addfile($file){
       if (!file_exists($file)){
+	$this->notify->debug('Not Adding '.$file.' to checkPath (ENOENT)');
 	return false;
       }
-      $this->notify->debug('Adding '.$file.' to checkPath');
+      $this->notify->debug('Adding File '.$file.' to checkPath');
       $this->files[] = $file;
     }
 
@@ -288,12 +289,11 @@ if (file_exists(dirname(__FILE__)."/../config/additional_files.cfg")){
       }
       $line = trim($line);
 
-      $cbins->notify->debug('Adding '.$line.' to checkpath');
+
       if (is_dir($line)){
 	$cbins->setadditional($line);
 	continue;
       }
-
       $cbins->addfile($line);
   }
 
@@ -322,6 +322,7 @@ if (in_array("--upd",$argv)){
   $file = $argv[$idx];
 
   if (file_exists($file)){
+    $cbins->notify->debug('Setting action to storeHash');
     $cbins->setaction('store');
     $cbins->checkfile($file);
     die;

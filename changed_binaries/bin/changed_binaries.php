@@ -295,6 +295,9 @@ if (file_exists(dirname(__FILE__)."/../config/additional_files.cfg")){
       $cbins->addfile($line);
   }
 
+  // Get the config file back out of memory
+  unset($lines);
+
 }
 
 $f = array_search('--updfile',$argv);

@@ -20,6 +20,9 @@ class changedbinariesNotify{
    protected $debugs = array();
    protected $secalerts = array();
    protected $config;
+   protected $infocount = 0;
+   protected $warncount = 0;
+   protected $alarmcount = 0;
 
 
   function __construct(){
@@ -29,7 +32,7 @@ class changedbinariesNotify{
 
   function alarm($str){
     echo "ALERT: ".$str."\n";
-
+    $this->alarmcount++;
     if ($this->config['alarm']){
 	$this->alarms[] = $str;
     }
@@ -38,6 +41,7 @@ class changedbinariesNotify{
 
   function warning($str){
     echo "WARN: ".$str."\n";
+    $this->warncount++;
     if ($this->config['warning']){
 	$this->warnings[] = $str;
     }
@@ -47,6 +51,7 @@ class changedbinariesNotify{
 
   function info($str){
     echo $str."\n";
+    $this->infocount++;
     if ($this->config['info']){
 	$this->infos[] = $str;
     }
@@ -80,7 +85,7 @@ class changedbinariesNotify{
 
     $msg = date('Y-m-d H:i:s') . ": Changed Binaries output follows\n".
 	  $secalerts . " Security alerts\n".
-	  count($this->alarms) . " Alarms\n" . count($this->warnings) . " Warnings\n" . count($this->infos) . " Information messages\n\n";
+	  $this->alarmcount . " Alarms\n" . $this->warncount . " Warnings\n" . $this->infocount . " Information messages\n\n";
 
     if ($secalerts > 0){
     $msg .=  "\n\nSECURITY ALERTS\n\n" . implode("\n",$this->secalerts);

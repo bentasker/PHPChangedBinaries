@@ -239,7 +239,7 @@ class changedbinariesmain{
 
 
 
-    /** Get input of some form from the user
+    /** Get input of some from from the user
     *
     */
     function getInput($msg){

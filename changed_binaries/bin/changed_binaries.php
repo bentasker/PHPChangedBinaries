@@ -252,7 +252,7 @@ class changedbinariesmain{
 }
 
 
-
+ini_set('memory_limit','256M'); // Make sure we don't hit an upper limit. See PHPCBA-4
 
 $cbins = new changedbinariesmain;
 
